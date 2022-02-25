@@ -19,14 +19,19 @@ def hello_world():
         genres = data['genres'],
         )
     """
-    
+@app.route('/')
+def hello_world():
+    return flask.render_template(
+        "home.html",
+        )
+app.run()
+"""
 @app.route('/', methods=["POST","GET"])
 def search():
     data = get_genres()
     movies = get_trending()
-    title = 'Trending'
-    
-    if flask.request.method == "POST":  
+    title = 'Trending'    
+    if flask.request.method == "POST":
         query = flask.request.form.get("search")
         title = query
         movies = movie_search(query)
@@ -63,3 +68,4 @@ app.run(
     port=int(os.getenv('PORT', 8080)),
     debug = True
 )
+"""

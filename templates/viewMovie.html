@@ -1,0 +1,28 @@
+<html>
+<head>
+   <link rel="stylesheet" href={{ url_for( 'static', filename='viewstyle.css' ) }} />
+</head>
+<body>
+    <div class="topnav">
+        <a class="active" href="https://project1-afinch6.herokuapp.com/">Home</a>
+        <a href="https://github.com/Afinch97/project1-afinch6">About</a>
+        <div class="search-container">
+            <form method="POST" action="/">
+                <input type="text" placeholder="Search..." name="search">
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+    <div class="movieInfo">
+        <div class="poster">
+            poster
+        </div>
+        <div class="details">
+            details
+        </div>
+    </div>
+    <div class="reviews">
+        review here
+    </div>
+</body>
+</html>
