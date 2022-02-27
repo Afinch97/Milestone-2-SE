@@ -276,4 +276,4 @@ def viewMovie(id):
          release_date = release_date, 
          id=id
         )
-app.run(debug=True)
+app.run()
