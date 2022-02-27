@@ -19,9 +19,12 @@ load_dotenv(find_dotenv())
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['SECRET_KEY'] = 'secret-key-goes-here'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL2')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+if app.config["SQLALCHEMY_DATABASE_URI"].startswith("postgres://"):
+    app.config["SQLALCHEMY_DATABASE_URI"] = app.config["SQLALCHEMY_DATABASE_URI"].replace("postgres://", "postgresql://") 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+db = SQLAlchemy(app, session_options={"autocommit": True})
 db.init_app(app)
 
 login_manager = LoginManager()
@@ -95,7 +98,7 @@ def signup_post():
         return redirect(url_for('signup'))
     
     new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
-    
+    db.session.begin()
     db.session.add(new_user)
     db.session.commit()
     
@@ -204,6 +207,7 @@ def addMovie(id):
     favorites = Favorites.query.filter(Favorites.email.like("%"+current_user.email+"%")).all()
     if favorites is None:
         new_movie = Favorites(email=current_user.email, movie=int(id))
+        db.session.begin()
         db.session.add(new_movie)
         db.session.commit()
         return redirect(url_for('favorites'))
@@ -211,6 +215,7 @@ def addMovie(id):
         flash("Movie is already added")
         return redirect(url_for('search'))
     new_movie = Favorites(email=current_user.email, movie=int(id))
+    db.session.begin()
     db.session.add(new_movie)
     db.session.commit()
     flash("Movie added to Favorites!")
@@ -222,6 +227,7 @@ def removeMovie(id):
     favorites = Favorites.query.filter_by(email=current_user.email,movie=id).first()
     if favorites is None:
         return redirect(url_for('favorites'))
+    db.session.begin()
     db.session.delete(favorites)
     db.session.commit()
     flash("Movie removed!")
@@ -236,6 +242,7 @@ def viewMovie(id):
         rating = request.form.get("rating")
         textReview = request.form.get("textReview")
         new_rating = Reviews(movie_id=int(id), user=current_user.name, rating=rating, text=textReview)
+        db.session.begin()
         db.session.add(new_rating)
         db.session.commit()
 
