@@ -2,11 +2,12 @@ import os
 import requests
 from dotenv import load_dotenv, find_dotenv
 import MediaWiki
-
+import json 
 load_dotenv(find_dotenv())
 
 BASE_URL = 'https://api.themoviedb.org/3/trending/movie/week?api_key='+ str(os.getenv('TMDB_KEY'))
 POSTER_PATH = 'https://image.tmdb.org/t/p/w185'
+POSTER_PATH_3='https://image.tmdb.org/t/p/w300'
 GENRE_URL = 'https://api.themoviedb.org/3/genre/movie/list?api_key='+str(os.getenv('TMDB_Key'))+'&language=en-US'
 
 def get_trending():
@@ -105,4 +106,46 @@ def movie_search(query):
         'posters': list(posters),
         'ids': list(ids),
         'taglines': list(taglines),
+    }
+
+def movie_info(id):
+    INFO_URL = 'https://api.themoviedb.org/3/movie/'+str(id)+'?api_key='+str(os.getenv('TMDB_KEY'))+'&language=en-US'
+    info = requests.get(INFO_URL)
+    data = info.json()
+    title = str(data["title"])
+    genres = ", ".join(genre["name"] for genre in data["genres"])
+    poster_path = data['poster_path']
+    if poster_path == None:
+        poster = None;
+    poster = POSTER_PATH_3 + poster_path
+    tagline = data['tagline']
+    overview = data['overview']
+    release_date = data['release_date']
+    
+    return (title, genres, poster, tagline, overview, release_date)
+
+def get_favorites(favs):
+    titles =[]
+    posters =[]
+    ids =[]
+    taglines=[]
+    for i in range(len(favs)):
+        INFO_URL = 'https://api.themoviedb.org/3/movie/'+str(favs[i])+'?api_key='+str(os.getenv('TMDB_KEY'))+'&language=en-US'
+        info = requests.get(INFO_URL)
+        data = info.json()
+        title = data['title']
+        ids.append(favs[i])
+        titles.append(title)
+        poster_path = data['poster_path']
+        if poster_path == None:
+            poster= None
+        poster = str(POSTER_PATH + poster_path)
+        posters.append(poster)
+        tagline = data['tagline']
+        taglines.append(tagline)
+    return {
+        'fav_titles': list(titles),
+        'fav_posters': list(posters),
+        'fav_ids': list(ids),
+        'fav_taglines': list(taglines),
     }

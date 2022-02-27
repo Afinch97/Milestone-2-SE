@@ -73,6 +73,9 @@ img {
     border: none;
     cursor: pointer;
 }
+form {
+    margin: 0;
+  }
 
 .topnav .search-container button:hover {
     background: #ccc;
