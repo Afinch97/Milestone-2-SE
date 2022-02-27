@@ -22,8 +22,6 @@ app.config['SECRET_KEY'] = 'secret-key-goes-here'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 if app.config["SQLALCHEMY_DATABASE_URI"].startswith("postgres://"):
     app.config["SQLALCHEMY_DATABASE_URI"] = app.config["SQLALCHEMY_DATABASE_URI"].replace("postgres://", "postgresql://") 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 db = SQLAlchemy(app, session_options={"autocommit": True})
 db.init_app(app)
 
@@ -283,4 +281,8 @@ def viewMovie(id):
          release_date = release_date, 
          id=id
         )
-app.run()
+app.run(
+        host=os.getenv('IP','0.0.0.0'),
+        port=int(os.getenv('PORT', 8080)),
+        debug = True
+)
